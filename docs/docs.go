@@ -59,7 +59,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Список пользователей",
                         "schema": {
-                            "$ref": "#/definitions/internal_user.ListResponse"
+                            "$ref": "#/definitions/user.ListResponse"
                         },
                         "headers": {
                             "X-Total-Count": {
@@ -107,7 +107,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_user.User"
+                            "$ref": "#/definitions/user.CreateUserRequest"
                         }
                     }
                 ],
@@ -115,7 +115,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Пользователь создан",
                         "schema": {
-                            "$ref": "#/definitions/internal_user.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "400": {
@@ -156,7 +156,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Пользователь найден",
                         "schema": {
-                            "$ref": "#/definitions/internal_user.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "404": {
@@ -196,7 +196,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_user.User"
+                            "$ref": "#/definitions/user.UpdateUserRequest"
                         }
                     }
                 ],
@@ -204,7 +204,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Пользователь обновлен",
                         "schema": {
-                            "$ref": "#/definitions/internal_user.User"
+                            "$ref": "#/definitions/user.User"
                         }
                     },
                     "400": {
@@ -263,7 +263,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "internal_user.ListResponse": {
+        "user.CreateUserRequest": {
+            "description": "Структура запроса для создания нового пользователя",
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "securepassword123"
+                }
+            }
+        },
+        "user.ListResponse": {
             "description": "Ответ с общим количеством и списком пользователей",
             "type": "object",
             "properties": {
@@ -274,12 +293,27 @@ const docTemplate = `{
                 "users": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_user.User"
+                        "$ref": "#/definitions/user.User"
                     }
                 }
             }
         },
-        "internal_user.User": {
+        "user.UpdateUserRequest": {
+            "description": "Структура запроса для обновления пользователя",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "newemail@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 8,
+                    "example": "newsecurepassword123"
+                }
+            }
+        },
+        "user.User": {
             "description": "Модель пользователя с email и паролем",
             "type": "object",
             "properties": {

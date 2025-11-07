@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"test/pkg/response"
@@ -57,13 +58,13 @@ func (uc *UserController) GetAll(w http.ResponseWriter, r *http.Request) {
 	limit := r.URL.Query().Get("limit")
 	limitInt, err := strconv.Atoi(limit)
 	if err != nil {
-		response.ErrorBadRequest(w, err)
+		response.ErrorBadRequest(w, errors.New("неверные параметры запроса"))
 		return
 	}
 	offset := r.URL.Query().Get("offset")
 	offsetInt, err := strconv.Atoi(offset)
 	if err != nil {
-		response.ErrorBadRequest(w, err)
+		response.ErrorBadRequest(w, errors.New("неверные параметры запроса"))
 		return
 	}
 
@@ -90,16 +91,20 @@ func (uc *UserController) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param user body user.User true "Данные пользователя"
+// @Param user body user.CreateUserRequest true "Данные пользователя"
 // @Success 200 {object} user.User "Пользователь создан"
 // @Failure 400 {object} map[string]string "Некорректные данные"
 // @Router /users [post]
 func (uc *UserController) Create(w http.ResponseWriter, r *http.Request) {
-	var user User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	var data CreateUserRequest
+	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		response.ErrorBadRequest(w, err)
 		return
+	}
+	user := User{
+		Email:    data.Email,
+		Password: data.Password,
 	}
 	err = uc.userRepository.Create(r.Context(), user)
 	if err != nil {
@@ -116,23 +121,50 @@ func (uc *UserController) Create(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param id path string true "ID пользователя"
-// @Param user body user.User true "Обновленные данные пользователя"
+// @Param user body user.UpdateUserRequest true "Обновленные данные пользователя"
 // @Success 200 {object} user.User "Пользователь обновлен"
 // @Failure 400 {object} map[string]string "Некорректные данные"
+// @Failure 404 {object} map[string]string "Пользователь не найден"
 // @Router /users/{id} [put]
 func (uc *UserController) Update(w http.ResponseWriter, r *http.Request) {
-	var user User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	id := chi.URLParam(r, "id")
+
+	// Преобразуем ID в uint
+	idInt, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		response.ErrorBadRequest(w, errors.New("некорректный ID"))
+		return
+	}
+
+	// Проверяем, существует ли пользователь
+	existingUser, err := uc.userRepository.GetByID(r.Context(), id)
+	if err != nil {
+		response.ErrorNotFound(w, errors.New("пользователь не найден"))
+		return
+	}
+
+	var data UpdateUserRequest
+	err = json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		response.ErrorBadRequest(w, err)
 		return
 	}
-	err = uc.userRepository.Update(r.Context(), user)
+
+	// Обновляем только переданные поля
+	existingUser.ID = uint(idInt)
+	if data.Email != "" {
+		existingUser.Email = data.Email
+	}
+	if data.Password != "" {
+		existingUser.Password = data.Password
+	}
+
+	err = uc.userRepository.Update(r.Context(), existingUser)
 	if err != nil {
 		response.ErrorBadRequest(w, err)
 		return
 	}
-	response.OutputJSON(w, user)
+	response.OutputJSON(w, existingUser)
 }
 
 // Delete удаляет пользователя по ID
