@@ -1,0 +1,208 @@
+basePath: /api
+definitions:
+  internal_user.ListResponse:
+    description: Ответ с общим количеством и списком пользователей
+    properties:
+      total:
+        example: 100
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/internal_user.User'
+        type: array
+    type: object
+  internal_user.User:
+    description: Модель пользователя с email и паролем
+    properties:
+      created_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      deleted_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      email:
+        example: user@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      password:
+        example: password123
+        type: string
+      updated_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: https://github.com/mihhha985/proxydb
+  description: Simple CRUD request to user repository
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: ProxyDB User Repository
+  version: "1.0"
+paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список всех пользователей с поддержкой пагинации
+      parameters:
+      - description: Количество записей
+        example: 10
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: Смещение
+        example: 0
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список пользователей
+          headers:
+            X-Total-Count:
+              description: Общее количество пользователей
+              type: string
+          schema:
+            $ref: '#/definitions/internal_user.ListResponse'
+        "400":
+          description: Некорректные параметры запроса
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить список пользователей
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Создает нового пользователя в системе
+      parameters:
+      - description: Данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/internal_user.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пользователь создан
+          schema:
+            $ref: '#/definitions/internal_user.User'
+        "400":
+          description: Некорректные данные
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создать нового пользователя
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет пользователя из системы по его ID
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пользователь удален
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Ошибка при удалении
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удалить пользователя
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Возвращает информацию о пользователе по его ID
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пользователь найден
+          schema:
+            $ref: '#/definitions/internal_user.User'
+        "404":
+          description: Пользователь не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить пользователя по ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные существующего пользователя
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Обновленные данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/internal_user.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Пользователь обновлен
+          schema:
+            $ref: '#/definitions/internal_user.User'
+        "400":
+          description: Некорректные данные
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновить пользователя
+      tags:
+      - users
+swagger: "2.0"
