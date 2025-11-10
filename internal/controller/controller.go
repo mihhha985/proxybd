@@ -1,20 +1,22 @@
-package user
+package controller
 
 import (
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
+	"test/internal/repository"
+	"test/pkg/request"
 	"test/pkg/response"
 
 	"github.com/go-chi/chi/v5"
 )
 
 type UserController struct {
-	userRepository IUserRepository
+	userRepository repository.IUserRepository
 }
 
-func NewUserController(userRepository IUserRepository) *UserController {
+func NewUserController(userRepository repository.IUserRepository) *UserController {
 	return &UserController{
 		userRepository: userRepository,
 	}
@@ -27,7 +29,7 @@ func NewUserController(userRepository IUserRepository) *UserController {
 // @Accept json
 // @Produce json
 // @Param id path string true "ID пользователя"
-// @Success 200 {object} user.User "Пользователь найден"
+// @Success 200 {object} UserResponse "Пользователь найден"
 // @Failure 404 {object} map[string]string "Пользователь не найден"
 // @Router /users/{id} [get]
 func (uc *UserController) GetOne(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +51,7 @@ func (uc *UserController) GetOne(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param limit query int true "Количество записей" example(10)
 // @Param offset query int true "Смещение" example(0)
-// @Success 200 {object} user.ListResponse "Список пользователей"
+// @Success 200 {object} UserResponse "Список пользователей"
 // @Failure 400 {object} map[string]string "Некорректные параметры запроса"
 // @Failure 500 {object} map[string]string "Внутренняя ошибка сервера"
 // @Header 200 {string} X-Total-Count "Общее количество пользователей"
@@ -68,7 +70,7 @@ func (uc *UserController) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conditions := Conditions{
+	conditions := request.Conditions{
 		Limit:  limitInt,
 		Offset: offsetInt,
 	}
@@ -91,8 +93,8 @@ func (uc *UserController) GetAll(w http.ResponseWriter, r *http.Request) {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param user body user.CreateUserRequest true "Данные пользователя"
-// @Success 200 {object} user.User "Пользователь создан"
+// @Param user body controller.CreateUserRequest true "Данные пользователя"
+// @Success 200 {object} UserResponse "Пользователь создан"
 // @Failure 400 {object} map[string]string "Некорректные данные"
 // @Router /users [post]
 func (uc *UserController) Create(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +104,7 @@ func (uc *UserController) Create(w http.ResponseWriter, r *http.Request) {
 		response.ErrorBadRequest(w, err)
 		return
 	}
-	user := User{
+	user := repository.User{
 		Email:    data.Email,
 		Password: data.Password,
 	}
@@ -121,11 +123,11 @@ func (uc *UserController) Create(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param id path string true "ID пользователя"
-// @Param user body user.UpdateUserRequest true "Обновленные данные пользователя"
-// @Success 200 {object} user.User "Пользователь обновлен"
+// @Param user body controller.UpdateUserRequest true "Обновленные данные пользователя"
+// @Success 200 {object} UserResponse "Пользователь обновлен"
 // @Failure 400 {object} map[string]string "Некорректные данные"
 // @Failure 404 {object} map[string]string "Пользователь не найден"
-// @Router /users/{id} [put]
+// @Router /users/update/{id} [post]
 func (uc *UserController) Update(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 

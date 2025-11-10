@@ -7,7 +7,8 @@ import (
 	_ "test/docs"
 
 	"test/config"
-	"test/internal/user"
+	"test/internal/controller"
+	"test/internal/repository"
 	"test/pkg/db"
 
 	"github.com/go-chi/chi/v5"
@@ -30,9 +31,9 @@ func main() {
 	var config = config.LoadConfig()
 	var db = db.NewDB(config)
 	//repositories
-	userRepo := user.NewUserRepository(db)
+	userRepo := repository.NewUserRepository(db)
 	//controllers
-	userController := user.NewUserController(userRepo)
+	userController := controller.NewUserController(userRepo)
 
 	// Initialize router
 	r := chi.NewRouter()
@@ -47,7 +48,7 @@ func main() {
 		r.Get("/users", userController.GetAll)
 		r.Get("/users/{id}", userController.GetOne)
 		r.Post("/users", userController.Create)
-		r.Put("/users/{id}", userController.Update)
+		r.Post("/users/update/{id}", userController.Update)
 		r.Delete("/users/{id}", userController.Delete)
 	})
 

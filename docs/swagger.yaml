@@ -1,6 +1,6 @@
 basePath: /api
 definitions:
-  user.CreateUserRequest:
+  controller.CreateUserRequest:
     description: Структура запроса для создания нового пользователя
     properties:
       email:
@@ -8,24 +8,9 @@ definitions:
         type: string
       password:
         example: securepassword123
-        minLength: 8
         type: string
-    required:
-    - email
-    - password
     type: object
-  user.ListResponse:
-    description: Ответ с общим количеством и списком пользователей
-    properties:
-      total:
-        example: 100
-        type: integer
-      users:
-        items:
-          $ref: '#/definitions/user.User'
-        type: array
-    type: object
-  user.UpdateUserRequest:
+  controller.UpdateUserRequest:
     description: Структура запроса для обновления пользователя
     properties:
       email:
@@ -33,17 +18,15 @@ definitions:
         type: string
       password:
         example: newsecurepassword123
-        minLength: 8
         type: string
     type: object
-  user.User:
-    description: Модель пользователя с email и паролем
+  controller.UserResponse:
     properties:
       created_at:
-        example: "2023-01-01T00:00:00Z"
+        example: "2024-01-01T12:00:00Z"
         type: string
       deleted_at:
-        example: "2023-01-01T00:00:00Z"
+        example: "2024-01-03T12:00:00Z"
         type: string
       email:
         example: user@example.com
@@ -52,10 +35,10 @@ definitions:
         example: 1
         type: integer
       password:
-        example: password123
+        example: securepassword123
         type: string
       updated_at:
-        example: "2023-01-01T00:00:00Z"
+        example: "2024-01-02T12:00:00Z"
         type: string
     type: object
 host: localhost:8080
@@ -100,7 +83,7 @@ paths:
               description: Общее количество пользователей
               type: string
           schema:
-            $ref: '#/definitions/user.ListResponse'
+            $ref: '#/definitions/controller.UserResponse'
         "400":
           description: Некорректные параметры запроса
           schema:
@@ -126,14 +109,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/user.CreateUserRequest'
+          $ref: '#/definitions/controller.CreateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Пользователь создан
           schema:
-            $ref: '#/definitions/user.User'
+            $ref: '#/definitions/controller.UserResponse'
         "400":
           description: Некорректные данные
           schema:
@@ -188,7 +171,7 @@ paths:
         "200":
           description: Пользователь найден
           schema:
-            $ref: '#/definitions/user.User'
+            $ref: '#/definitions/controller.UserResponse'
         "404":
           description: Пользователь не найден
           schema:
@@ -198,7 +181,8 @@ paths:
       summary: Получить пользователя по ID
       tags:
       - users
-    put:
+  /users/update/{id}:
+    post:
       consumes:
       - application/json
       description: Обновляет данные существующего пользователя
@@ -213,16 +197,22 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/user.UpdateUserRequest'
+          $ref: '#/definitions/controller.UpdateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Пользователь обновлен
           schema:
-            $ref: '#/definitions/user.User'
+            $ref: '#/definitions/controller.UserResponse'
         "400":
           description: Некорректные данные
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Пользователь не найден
           schema:
             additionalProperties:
               type: string

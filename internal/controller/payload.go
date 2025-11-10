@@ -1,17 +1,12 @@
-package user
+package controller
+
+import "test/internal/repository"
 
 // ListResponse представляет ответ со списком пользователей
 // @Description Ответ с общим количеством и списком пользователей
 type ListResponse struct {
-	Total int64  `json:"total" example:"100"`
-	Users []User `json:"users"`
-}
-
-// Conditions представляет параметры для пагинации
-// @Description Условия для получения списка с пагинацией
-type Conditions struct {
-	Limit  int `json:"limit" example:"10"`
-	Offset int `json:"offset" example:"0"`
+	Total int64             `json:"total" example:"100"`
+	Users []repository.User `json:"users"`
 }
 
 // CreateUserRequest представляет данные для создания пользователя
@@ -26,4 +21,13 @@ type CreateUserRequest struct {
 type UpdateUserRequest struct {
 	Email    string `json:"email,omitempty" example:"newemail@example.com"`
 	Password string `json:"password,omitempty" example:"newsecurepassword123"`
+}
+
+type UserResponse struct {
+	ID        uint    `json:"id" example:"1"`
+	CreatedAt string  `json:"created_at" example:"2024-01-01T12:00:00Z"`
+	UpdatedAt string  `json:"updated_at" example:"2024-01-02T12:00:00Z"`
+	DeletedAt *string `json:"deleted_at,omitempty" example:"2024-01-03T12:00:00Z"`
+	Email     string  `json:"email" example:"user@example.com"`
+	Password  string  `json:"password" example:"securepassword123"`
 }

@@ -53,7 +53,7 @@
                     "200": {
                         "description": "Список пользователей",
                         "schema": {
-                            "$ref": "#/definitions/user.ListResponse"
+                            "$ref": "#/definitions/controller.UserResponse"
                         },
                         "headers": {
                             "X-Total-Count": {
@@ -101,7 +101,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.CreateUserRequest"
+                            "$ref": "#/definitions/controller.CreateUserRequest"
                         }
                     }
                 ],
@@ -109,11 +109,70 @@
                     "200": {
                         "description": "Пользователь создан",
                         "schema": {
-                            "$ref": "#/definitions/user.User"
+                            "$ref": "#/definitions/controller.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Некорректные данные",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/update/{id}": {
+            "post": {
+                "description": "Обновляет данные существующего пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Обновить пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID пользователя",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Обновленные данные пользователя",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Пользователь обновлен",
+                        "schema": {
+                            "$ref": "#/definitions/controller.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректные данные",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Пользователь не найден",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -150,59 +209,11 @@
                     "200": {
                         "description": "Пользователь найден",
                         "schema": {
-                            "$ref": "#/definitions/user.User"
+                            "$ref": "#/definitions/controller.UserResponse"
                         }
                     },
                     "404": {
                         "description": "Пользователь не найден",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Обновляет данные существующего пользователя",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Обновить пользователя",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID пользователя",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Обновленные данные пользователя",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.UpdateUserRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Пользователь обновлен",
-                        "schema": {
-                            "$ref": "#/definitions/user.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Некорректные данные",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -257,13 +268,9 @@
         }
     },
     "definitions": {
-        "user.CreateUserRequest": {
+        "controller.CreateUserRequest": {
             "description": "Структура запроса для создания нового пользователя",
             "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
             "properties": {
                 "email": {
                     "type": "string",
@@ -271,28 +278,11 @@
                 },
                 "password": {
                     "type": "string",
-                    "minLength": 8,
                     "example": "securepassword123"
                 }
             }
         },
-        "user.ListResponse": {
-            "description": "Ответ с общим количеством и списком пользователей",
-            "type": "object",
-            "properties": {
-                "total": {
-                    "type": "integer",
-                    "example": 100
-                },
-                "users": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/user.User"
-                    }
-                }
-            }
-        },
-        "user.UpdateUserRequest": {
+        "controller.UpdateUserRequest": {
             "description": "Структура запроса для обновления пользователя",
             "type": "object",
             "properties": {
@@ -302,22 +292,20 @@
                 },
                 "password": {
                     "type": "string",
-                    "minLength": 8,
                     "example": "newsecurepassword123"
                 }
             }
         },
-        "user.User": {
-            "description": "Модель пользователя с email и паролем",
+        "controller.UserResponse": {
             "type": "object",
             "properties": {
                 "created_at": {
                     "type": "string",
-                    "example": "2023-01-01T00:00:00Z"
+                    "example": "2024-01-01T12:00:00Z"
                 },
                 "deleted_at": {
                     "type": "string",
-                    "example": "2023-01-01T00:00:00Z"
+                    "example": "2024-01-03T12:00:00Z"
                 },
                 "email": {
                     "type": "string",
@@ -329,11 +317,11 @@
                 },
                 "password": {
                     "type": "string",
-                    "example": "password123"
+                    "example": "securepassword123"
                 },
                 "updated_at": {
                     "type": "string",
-                    "example": "2023-01-01T00:00:00Z"
+                    "example": "2024-01-02T12:00:00Z"
                 }
             }
         }

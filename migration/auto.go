@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"test/internal/user"
+	"test/internal/repository"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -17,5 +17,5 @@ func main() {
 	if err != nil {
 		panic("Failed to connect to database")
 	}
-	db.AutoMigrate(&user.User{})
+	db.AutoMigrate(&repository.User{})
 }

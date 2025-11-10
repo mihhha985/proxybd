@@ -1,9 +1,10 @@
-package user
+package repository
 
 import (
 	"context"
 	"strconv"
 	"test/pkg/db"
+	"test/pkg/request"
 )
 
 type IUserRepository interface {
@@ -11,8 +12,7 @@ type IUserRepository interface {
 	GetByID(ctx context.Context, id string) (User, error)
 	Update(ctx context.Context, user User) error
 	Delete(ctx context.Context, id string) error
-	GetByEmail(ctx context.Context, email string) (User, error)
-	List(ctx context.Context, c Conditions) ([]User, error)
+	List(ctx context.Context, c request.Conditions) ([]User, error)
 	Count() int64
 }
 
@@ -48,25 +48,18 @@ func (repo *UserRepository) Delete(ctx context.Context, id string) error {
 	return repo.Database.WithContext(ctx).Delete(&User{}, "id = ?", id).Error
 }
 
-func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (User, error) {
-	var user User
-	err := repo.Database.WithContext(ctx).First(&user, "email = ?", email).Error
-	return user, err
-}
-
 func (repo *UserRepository) Count() int64 {
 	var count int64
-	repo.Database.Model(&User{}).Where("deleted_at IS null").Count(&count)
+	repo.Database.Model(&User{}).Count(&count)
 	return count
 }
 
-func (repo *UserRepository) List(ctx context.Context, c Conditions) ([]User, error) {
+func (repo *UserRepository) List(ctx context.Context, c request.Conditions) ([]User, error) {
 	var users []User
 
 	result := repo.Database.
 		WithContext(ctx).
 		Table("users").
-		Where("deleted_at IS null").
 		Order("id desc").
 		Limit(c.Limit).
 		Offset(c.Offset).
